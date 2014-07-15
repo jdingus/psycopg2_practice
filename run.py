@@ -1,14 +1,14 @@
 import csv
 
-def load_dict(dict_csv):
+def load_dict(csv_file):
 	"""
 	Will take .csv file and use header to create a list of dictionaries of each row
 	"""
-	file_name = dict_csv
+	# file_name = csv_file
 	delimiter = ','
 	quote_character = '"'
 
-	csv_fp = open(file_name, 'rb')
+	csv_fp = open(csv_file, 'rb')
 	csv_reader = csv.DictReader(csv_fp, fieldnames=[], restkey='undefined-fieldnames', delimiter=delimiter, quotechar=quote_character)
 
 	current_row = 0
