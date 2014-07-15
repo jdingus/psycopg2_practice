@@ -45,30 +45,35 @@ def insert_nulls(csv_list_dict):
 			if item[key] == '':
 				item[key] = 'NULL'
 
-def in_dbase(cursor_obj):
-  pass
+def in_dbase(cursor_obj,table_name,col_name,find_string):
+  """
+  Checks to see if a find_string entry is in passed table_name and col_name
+  If present will return 1, not present will return 0
+  """
   conn = cursor_obj
   cursor = conn.cursor()
-  cursor.execute('SELECT * FROM species')
+  cursor.execute('SELECT * FROM %s;' % (table_name))
   print cursor.fetchall()
-  cursor.execute("""SELECT COUNT(*) FROM species WHERE 'Dogs' = species.name""") 
+  cursor.execute(
+    'SELECT * FROM %s WHERE %s = %s;' % (table_name, col_name, find_string)) 
+  cursor_list = []
   cursor_list = cursor.fetchall()
-  for item in cursor_list:
-     if item[0] == 0:
-        return 0
-     else: return 1
-#     cursor.execute('SELECT * FROM species')  
+  if len(cursor_list) > 0:
+    return 1
+  else: return 0
 
 
 def main():
   """ Main function """
-  conn = db_connect()
+  conn = db_connect() # Connect to pets dbase
   csv_list = load_dict('pets_to_add.csv') # Create list of dictionaries as csv_header[data]
   insert_nulls(csv_list)  # Checks all blank entries in CSV and inserts NULL
   
   """ Check to see if entries in dbase if not add, normalize for caps """
-  print in_dbase(conn) # conn,'species','dog'
-#   in_dbase(conn,'breed')
+  print in_dbase(conn,'species','species.name',"'Dog'")  # table_name, col_name, find_string >> "'string'"
+  print in_dbase(conn,'breed','breed.name',"'Mixed'")
+  
+  #   in_dbase(conn,'breed')
 #   in_dbase(conn,'shelter')
 
 
