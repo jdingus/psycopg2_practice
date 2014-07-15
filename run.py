@@ -7,7 +7,7 @@ def db_connect():
   """
   try:
       conn = psycopg2.connect("dbname='pets' host='localhost' password='dbpass'")
-      print "Connect to dbase!"
+      print "Connected to pets dbase!"
       return conn
   except:
       print "I am unable to connect to the database"
@@ -49,7 +49,14 @@ def in_dbase(cursor_obj):
   pass
   conn = cursor_obj
   cursor = conn.cursor()
-#   cursor.execute('SELECT COUNT(*) FROM species WHERE species.name = Cat')  
+  cursor.execute('SELECT * FROM species')
+  print cursor.fetchall()
+  cursor.execute("""SELECT COUNT(*) FROM species WHERE 'Dogs' = species.name""") 
+  cursor_list = cursor.fetchall()
+  for item in cursor_list:
+     if item[0] == 0:
+        return 0
+     else: return 1
 #     cursor.execute('SELECT * FROM species')  
 
 
@@ -60,9 +67,10 @@ def main():
   insert_nulls(csv_list)  # Checks all blank entries in CSV and inserts NULL
   
   """ Check to see if entries in dbase if not add, normalize for caps """
-  in_dbase(conn) # conn,'species','dog'
+  print in_dbase(conn) # conn,'species','dog'
 #   in_dbase(conn,'breed')
 #   in_dbase(conn,'shelter')
+
 
 
 if __name__ == "__main__":
