@@ -7,7 +7,7 @@ def db_connect():
   """
   try:
       conn = None
-      conn = psycopg2.connect("dbname='pets' user='jdingus'")
+      conn = psycopg2.connect("dbname='pets'")  # user='jdingus'")
       print "Connected to pets dbase!"
       return conn
   except:
@@ -23,7 +23,9 @@ def load_dict(csv_file):
     quote_character = '"'
 
     csv_fp = open(csv_file, 'rb')
-    csv_reader = csv.DictReader(csv_fp, fieldnames=[], restkey='undefined-fieldnames', delimiter=delimiter, quotechar=quote_character)
+    csv_reader = csv.DictReader(csv_fp, fieldnames=[], 
+      restkey='undefined-fieldnames', delimiter=delimiter,
+      quotechar=quote_character)
 
     current_row = 0
     csv_list=[] 
@@ -87,14 +89,35 @@ def csv_insert_db(cursor_obj,csv_list_dict):
   cursor = conn.cursor()
 
   for dicts in csv_list_dict:
-    ck_species = dicts[" species name"]
-    print ck_species
-    # for key in dicts:
-    #   if item[key] == '':
-    #     item[key] = 'NULL'
+    """ Each dict check to see if breed, species, or shelter already in dbase"""
+    breed_ck = dicts['breed name']
+    breed_ck = "'" + breed_ck + "'"
+    species_ck = dicts['species name']
+    species_ck = "'" + species_ck + "'"
+    shelter_ck = dicts['shelter name']
+    shelter_ck = "'" + shelter_ck + "'"
+    print dicts['breed name']
+    if in_dbase(conn, 'breed', 'breed.name', breed_ck) == 0:
+      insert_record_table(conn,'breed','breed.name',breed_ck)
+#       insert_record_new(conn,dicts)
+      print dicts['species name']
+    if in_dbase(conn, 'species', 'species.name', species_ck) == 0:
+      insert_record_table(conn,'species','species.name',species_ck)
+      print dicts['shelter name']
+    if in_dbase(conn, 'shelter', 'shelter.name', shelter_ck) == 0:
+      insert_record_table(conn,'shelter','shelter.name',shelter_ck)
+    print ''
 
+      
+def insert_record_table(conn,table_name,col_name,in_string):
+  print "Inserting into Table: {0} *** Column: {1} *** Entry is: {2}".format(table_name,col_name,in_string)
+  
 
-
+def insert_record_new(conn,dicts):
+  """
+  Takes dictionary and inserts record into dbase pets
+  """
+  print "Inserting into Table: {0} *** Column: {1} *** Entry is: {2}".format(table_name,col_name,in_string)  
 
 
 def main():
@@ -104,14 +127,7 @@ def main():
   insert_nulls(csv_list)  # Checks all blank entries in CSV and inserts NULL
   
 
-  csv_insert_db(conn,csv_list)
-
-
-  # """ Check to see if entries in dbase if not add, normalize for caps """
-  print in_dbase(conn,'species','species.name',"' DOG'")  # Make sure to ESCAPE find_string >> "'string'"
-  # print in_dbase(conn,'breed','breed.name',"'Mixed'")
-
-
+  csv_insert_db(conn,csv_list) # Do work of inserting records into dbase
 
 
 if __name__ == "__main__":
