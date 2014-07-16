@@ -35,11 +35,15 @@ def load_dict(csv_file):
             csv_reader.fieldnames = row['undefined-fieldnames']
             continue
         csv_list.append(row)
-    print csv_list
-    for item in csv_list:
-      for k, v in item.iteritems():
-        item[k] = v.lstrip()
-    print csv_list
+
+    insert_nulls(csv_list)  # Checks all blank entries in CSV and inserts NULL
+    
+    # for item in csv_list:
+    csv_list[0] = strip_dict(csv_list[0])
+    print csv_list[0]
+
+    # print csv_list
+    
     return csv_list
 
 def insert_nulls(csv_list_dict):
@@ -50,6 +54,12 @@ def insert_nulls(csv_list_dict):
         for key in item:
             if item[key] == '':
                 item[key] = 'NULL'
+
+def strip_dict(d):
+    return { key : strip_dict(value)
+             if isinstance(value, dict)
+             else value.strip()
+             for key, value in d.items() }
 
 def in_dbase(cursor_obj,table_name,col_name,find_string):
   """
