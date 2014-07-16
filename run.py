@@ -11,6 +11,7 @@ def db_connect():
       conn = None
       conn = psycopg2.connect("dbname='pets'")  # user='jdingus'")
       print "Connected to pets dbase!"
+
       return conn
   except:
       print "I am unable to connect to the database"
@@ -100,7 +101,7 @@ def csv_insert_db(cursor_obj,csv_list_dict):
     shelter_ck = "'" + shelter_ck + "'"
     print dicts['breed name']
     if in_dbase(conn, 'breed', 'breed.name', breed_ck) == 0:
-      insert_breed(conn,'breed','breed.name',breed_ck)
+      insert_breed(conn,'breed','name',breed_ck)
 # #       insert_record_new(conn,dicts)
 #       print dicts['species name']
 #     if in_dbase(conn, 'species', 'species.name', species_ck) == 0:
@@ -113,11 +114,11 @@ def csv_insert_db(cursor_obj,csv_list_dict):
       
 def insert_breed(cursor_obj,table_name,col_name,in_string):
   conn = cursor_obj
-  cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+  cursor = conn.cursor()
   print "Inserting into Table: {0} *** Column: {1} *** Entry is: {2}".format(table_name,col_name,in_string)
-  cursor.execute("INSERT into breed (name) VALUES ('Catty2');")
-  rows = cursor.fetchall()
-  print rows
+  cursor.execute("INSERT INTO breed (name) VALUES (%s)", (in_string,))
+  cursor.execute("SELECT * FROM breed;")
+  print cursor.fetchall()
 #     'SELECT * FROM %s WHERE %s ilike %s;' % (table_name, col_name, find_string)) 
   
 
@@ -133,8 +134,6 @@ def main():
   conn = db_connect() # Connect to pets dbase
   csv_list = load_dict('pets_to_add.csv') # Create list of dictionaries with csv header as keys in dicts
   insert_nulls(csv_list)  # Checks all blank entries in CSV and inserts NULL
-  
-
   csv_insert_db(conn,csv_list) # Do work of inserting records into dbase
 
 
