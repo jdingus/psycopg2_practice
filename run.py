@@ -1,5 +1,7 @@
 import csv
 import psycopg2
+import psycopg2.extras
+import sys
 
 def db_connect():
   """
@@ -98,19 +100,25 @@ def csv_insert_db(cursor_obj,csv_list_dict):
     shelter_ck = "'" + shelter_ck + "'"
     print dicts['breed name']
     if in_dbase(conn, 'breed', 'breed.name', breed_ck) == 0:
-      insert_record_table(conn,'breed','breed.name',breed_ck)
-#       insert_record_new(conn,dicts)
-      print dicts['species name']
-    if in_dbase(conn, 'species', 'species.name', species_ck) == 0:
-      insert_record_table(conn,'species','species.name',species_ck)
-      print dicts['shelter name']
-    if in_dbase(conn, 'shelter', 'shelter.name', shelter_ck) == 0:
-      insert_record_table(conn,'shelter','shelter.name',shelter_ck)
-    print ''
+      insert_breed(conn,'breed','breed.name',breed_ck)
+# #       insert_record_new(conn,dicts)
+#       print dicts['species name']
+#     if in_dbase(conn, 'species', 'species.name', species_ck) == 0:
+#       insert_record_table(conn,'species','species.name',species_ck)
+#       print dicts['shelter name']
+#     if in_dbase(conn, 'shelter', 'shelter.name', shelter_ck) == 0:
+#       insert_record_table(conn,'shelter','shelter.name',shelter_ck)
+#     print ''
 
       
-def insert_record_table(conn,table_name,col_name,in_string):
+def insert_breed(cursor_obj,table_name,col_name,in_string):
+  conn = cursor_obj
+  cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
   print "Inserting into Table: {0} *** Column: {1} *** Entry is: {2}".format(table_name,col_name,in_string)
+  cursor.execute("INSERT into breed (name) VALUES ('Catty2');")
+  rows = cursor.fetchall()
+  print rows
+#     'SELECT * FROM %s WHERE %s ilike %s;' % (table_name, col_name, find_string)) 
   
 
 def insert_record_new(conn,dicts):
