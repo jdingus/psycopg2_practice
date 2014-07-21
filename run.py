@@ -137,9 +137,12 @@ def main():
   conn = db_connect() # Connect to pets dbase
   csv_list = load_dict('pets_to_add.csv') # Create list of dictionaries with csv header as keys in dicts
 
-  print len(csv_list)
+  print csv_list
+
+  print in_dbase(conn,'breed','name',"'mixed'")
+
   quit()
-  
+
   csv_insert_db(conn,csv_list) # Do work of inserting records into dbase
 
 
