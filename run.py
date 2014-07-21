@@ -21,7 +21,6 @@ def load_dict(csv_file):
     """
     Will take .csv file and use header to create a list of dictionaries of each row
     """
-    # file_name = csv_file
     delimiter = ','
     quote_character = '"'
 
@@ -43,11 +42,9 @@ def load_dict(csv_file):
 
     insert_nulls(csv_list)  # Checks all blank entries in CSV and inserts NULL
     
-    # for item in csv_list:
     csv_list[0] = strip_dict(csv_list[0])
-    print csv_list[0]
-
-    # print csv_list
+    
+    # print csv_list[0]
     
     return csv_list
 
@@ -85,8 +82,8 @@ def in_dbase(cursor_obj,table_name,col_name,find_string):
 
 def csv_insert_db(cursor_obj,csv_list_dict):
   """
-  Loop Thru each csv_list of dicts, check if species,breed,shelter in pets db; if not create db entry in respective tables,
-  Then add each csv entry into db
+  Loop Thru each csv_list of dicts, check if species,breed,shelter in pets db; 
+  if not create db entry in respective tables, Then add each csv entry into db
   """
   conn = cursor_obj
   cursor = conn.cursor()
@@ -131,9 +128,18 @@ def insert_record_new(conn,dicts):
 
 def main():
   """ Main function """
+
+  """ Initialize pets dbase """
+  import os
+  os.system("psql -d pets < create_pets.sql")
+
+  """ Connect to pets dabase """
   conn = db_connect() # Connect to pets dbase
   csv_list = load_dict('pets_to_add.csv') # Create list of dictionaries with csv header as keys in dicts
-  insert_nulls(csv_list)  # Checks all blank entries in CSV and inserts NULL
+
+  print len(csv_list)
+  quit()
+  
   csv_insert_db(conn,csv_list) # Do work of inserting records into dbase
 
 
