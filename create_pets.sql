@@ -56,7 +56,7 @@ CREATE SEQUENCE pet_id_seq;
 create table pet (
     id integer primary key default nextval('pet_id_seq'),
     name text ,
-    age integer,
+    age integer,null
     adopted boolean,
     dead boolean,
     breed_id integer references breed(id),
