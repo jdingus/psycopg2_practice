@@ -55,7 +55,7 @@ def insert_nulls(csv_list_dict):
     for item in csv_list_dict:
         for key in item:
             if item[key] == '':
-                item[key] = 'NULL'
+                item[key] = None
 
 def strip_dict(d):
     return { key : strip_dict(value)
@@ -68,6 +68,8 @@ def in_dbase(cursor_obj,table_name,col_name,find_string):
   Checks to see if a find_string entry is in passed table_name and col_name
   If present will return 1, not present will return 0, Note this comparison is case insensitive
   """
+  if find_string == None:
+    return False # Don't add a None field to the dbase
   find_string = "'" + find_string + "'"
   conn = cursor_obj
   cursor = conn.cursor()
@@ -79,6 +81,16 @@ def in_dbase(cursor_obj,table_name,col_name,find_string):
     return True
   else: return False
 
+def insert_line_csv(cursor_obj,list_insert):
+	conn = cursor_obj
+	cursor = conn.cursor()
+	SQL = "INSERT INTO pet (name,age,adopted) VALUES (%s);"
+	data = list_insert
+	cursor.execute(SQL,data)
+	conn.commit()
+	return
+  
+  
 def csv_insert_db(cursor_obj,csv_list_dict):
   """
   Loop Thru each csv_list of dicts, check if species,breed,shelter in pets db; 
@@ -98,19 +110,11 @@ def csv_insert_db(cursor_obj,csv_list_dict):
     print dicts['breed name']
     if in_dbase(conn, 'breed', 'breed.name', breed_ck) == 0:
       insert_breed(conn,'breed','name',breed_ck)
-# #       insert_record_new(conn,dicts)
-#       print dicts['species name']
-#     if in_dbase(conn, 'species', 'species.name', species_ck) == 0:
-#       insert_record_table(conn,'species','species.name',species_ck)
-#       print dicts['shelter name']
-#     if in_dbase(conn, 'shelter', 'shelter.name', shelter_ck) == 0:
-#       insert_record_table(conn,'shelter','shelter.name',shelter_ck)
-#     print ''
 
-      
 def insert_record(cursor_obj,table_name,col_name,in_string):
 	conn = cursor_obj
 	cursor = conn.cursor()
+
 	if table_name == 'shelter':
 		SQL = "INSERT INTO shelter (name) VALUES (%s);"
 		data = (in_string, )
@@ -137,21 +141,9 @@ def insert_record(cursor_obj,table_name,col_name,in_string):
 			data = (in_string, )
 			print 'found one!'
 
-	
 	cursor.execute(SQL,data)
 	conn.commit()
 	return
-	# cursor.execute("SELECT * FROM shelter;")
-	# print cursor.fetchall()
-#     'SELECT * FROM %s WHERE %s ilike %s;' % (table_name, col_name, find_string)) 
-  
-
-def insert_record_new(conn,dicts):
-  """
-  Takes dictionary and inserts record into dbase pets
-  """
-  print "Inserting into Table: {0} *** Column: {1} *** Entry is: {2}".format(table_name,col_name,in_string)  
-
 
 def main():
 	""" Initialize pets dbase """
@@ -169,36 +161,30 @@ def main():
 	""" Add species, breed or shelter if not already in dbase """
 	for item in csv_list:
 		for key in item:
-			if key=='shelter name' and item[key] != 'NULL':
+			if key=='shelter name' and item[key] != None:
 				if not in_dbase(conn,'shelter','name',item[key]):
 					print "I need to add this shelter name!",item[key] 
 					insert_record(conn,'shelter','name',item[key])
-					# continue
 
-			if key=='breed name' and item[key] != 'NULL':
+			if key=='breed name' and item[key] != None:
 				if not in_dbase(conn,'breed','name',item[key]):
 					print "I need to add this breed name!",item[key] 
 					insert_record(conn,'breed','name',item[key])
-					# continue 	
 
-			if key=='species name' and item[key] != 'NULL':
+			if key=='species name' and item[key] != None:
 				if not in_dbase(conn,'species','name',item[key]):
 					print "I need to add this species name!",item[key] 
 					insert_record(conn,'species','name',item[key]) 	
-					# continue
 
 	""" Add all entries from csv file into dbase
 	Name,age,breed name,species name,shelter name,adopted
 	"""
-	for item in csv_list:
-		insert_record(conn,'pet','name',item['Name'])
-		insert_record(conn,'pet','age',item['age'])
-		# insert_record(conn,'pet','breed',item['breed name'])
-		# insert_record(conn,'pet','species',item['species name'])
-		# insert_record(conn,'pet','shelter',item['shelter name'])
-		insert_record(conn,'pet','adopted',item['adopted'])
+	print type(csv_list)
+  
+# 	for item in csv_list:
+# 		insert_line_csv(conn,item)
 
-  # csv_insert_db(conn,csv_list) # Do work of inserting records into dbase
+    
 
 
 if __name__ == "__main__":
