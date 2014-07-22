@@ -81,12 +81,19 @@ def in_dbase(cursor_obj,table_name,col_name,find_string):
     return True
   else: return False
 
-def insert_line_csv(cursor_obj,list_insert):
+def insert_line_csv(cursor_obj,dict_item):
 	conn = cursor_obj
 	cursor = conn.cursor()
-	SQL = "INSERT INTO pet (name,age,adopted) VALUES (%s);"
-	data = list_insert
-	cursor.execute(SQL,data)
+
+# 	cursor.execute(SQL,data)
+# 	print type(list_insert)
+	my_dict = dict_item
+	fields = ', '.join(my_dict.keys())
+	values = ', '.join(['%%(%s)s' % x for x in my_dict])
+	query = 'INSERT INTO pet (%s) VALUES (%s)' % (fields, values)
+# 	query = 'INSERT INTO some_table (%s) VALUES (%s)' % (fields, values)
+	cursor.execute(query, my_dict)
+	
 	conn.commit()
 	return
   
@@ -179,9 +186,8 @@ def main():
 	""" Add all entries from csv file into dbase
 	Name,age,breed name,species name,shelter name,adopted
 	"""
-	print type(csv_list)
-  
-# 	for item in csv_list:
+	for item in csv_list:
+		print item
 # 		insert_line_csv(conn,item)
 
     
